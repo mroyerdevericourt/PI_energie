@@ -16,7 +16,7 @@ villes = "Barbey. Blennes. Cannes Écluse. Chevry-en-Sereine. Courcelles-en-Bass
 villes = villes.upper().split('. ')
 
 
-base = adresse #[(adresse["NOM_COMMUNE"].isin(villes)) & pd.Series(map(lambda x : x[:2] == '77', adresse["CODE_IRIS"]))]
+base = adresse[(adresse["NOM_COMMUNE"].isin(villes)) & pd.Series(map(lambda x : x[:2] == '77', adresse["CODE_IRIS"]))]
 print (base.head())
 longueur = base.shape[0]
 # new_df["latitude"] = [None]*longueur
@@ -24,12 +24,13 @@ longueur = base.shape[0]
 # try: 
     # effacer la base de donnée créée
 
-# base.to_csv('data/DLE-elec-2019-CCPM.csv',sep = ';')
+base.to_csv('data/DLE-elec-2019-CCPM.csv',sep = ';')
+erreur = 0
 i=0
 def get_location(adresse, code_iris, ville=''):
     global i
     i += 1
-    print(i)
+    print(f'{i*100/longueur : .3f} %')
     recherche = '+'.join((adresse + ville).split())
     citycode = str(code_iris)[:5]
     url = f'https://api-adresse.data.gouv.fr/search/?q={recherche}&citycode={citycode}&limit=1'
@@ -37,24 +38,19 @@ def get_location(adresse, code_iris, ville=''):
     while status != 200:
         reponse = requests.get(url)
         status = reponse.status_code
-        datum = reponse.json()
-        # if i > 320 :
-        #     print(datum["features"])
-        #     print(url)
-        try : 
-            lon, lat = datum["features"][0]["geometry"]["coordinates"]
-        except IndexError:
-            return None, None
-
-        # properties = datum["features"][0]["properties"]
-        return lat, lon
+    datum = reponse.json()
+    try : 
+        lon, lat = datum["features"][0]["geometry"]["coordinates"]
+    except IndexError:
+        erreur += 1
+        return None, None
+    return lat, lon
 
 
 Res = list(map(get_location, base["ADRESSE"], base["CODE_IRIS"]))
 Latit = [elem[0] for elem in Res]
 Long = [elem[1] for elem in Res]
-base = base.assign(latitude = Latit)
-base = base.assign(longitude = Long)
+base = base.assign(latitude = Latit, longitude = Long)
 
 print(base.head())
-base.to_csv('data/DLE-elec-2019-geocoded.csv',sep = ';')
+base.to_csv('data/DLE-elec-2019-CCPM-geocoded.csv',sep = ';')
