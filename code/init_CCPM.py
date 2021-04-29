@@ -56,19 +56,22 @@ def treat_json(base, L, sortie):
     erreur = 0
     Lon = []
     Lat = []
+    Geo_id = []
     Score = []
     for elem in L:
         try : 
             lon, lat = elem["features"][0]["geometry"]["coordinates"]
+            geo_id = elem["features"][0]["properties"]['id']
             score = elem["features"][0]["properties"]["score"]
         except IndexError:
             erreur += 1
         Lon.append(lon)
         Lat.append(lat)
+        Geo_id.append(geo_id)
         Score.append(score)
     print(f'Traitement terminé, il y a eu {erreur} erreur(s)')
     print('Encryptage dans', sortie)
-    base = base.assign(latitude = Lat, longitude = Lon, score = Score)
+    base = base.assign(latitude = Lat, longitude = Lon, id = geo_id, score = Score)
     print(base.head())
     base.to_csv(sortie, sep = ';')
     print('\n Encryptage terminé')
