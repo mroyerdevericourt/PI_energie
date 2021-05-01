@@ -71,7 +71,7 @@ def treat_json(base, L, sortie):
         Score.append(score)
     print(f'Traitement terminé, il y a eu {erreur} erreur(s)')
     print('Encryptage dans', sortie)
-    base = base.assign(latitude = Lat, longitude = Lon, id = geo_id, score = Score)
+    base = base.assign(latitude = Lat, longitude = Lon, id = Geo_id, score = Score)
     print(base.head())
     base.to_csv(sortie, sep = ';')
     print('\n Encryptage terminé')
