@@ -7,6 +7,13 @@ dpe = pd.read_csv('data/DPE_CCPM.csv', sep = ';')
 def convert_e2f(string):
     return float(string[0]+string[2:8]) * 10**(int(string[9:]) - 6)
 
+limite_classe_energie = {50 : 'A', 90 : 'B', 150 : 'C', 230 : 'D', 330 : 'E', 450 : 'F',}
+
+
+def encadrement(val, dict):
+    pass
+
+
 elec['CONSO'] = elec['CONSO'].apply(convert_e2f)
 gaz['CONSO'] = gaz['CONSO'].apply(convert_e2f)
 # Aggregation sur l'id d'etalab
@@ -36,7 +43,7 @@ for elem in {'consommation_energie', 'estimation_ges'}:
     dpe[elem + '_brut'] = (dpe[elem] * dpe['surface_habitable'])
 
 # print(dpe[['consommation_energie', 'consommation_energie_brut', 'surface_habitable', 'estimation_ges', 'estimation_ges_brut']])
-dpe.rename(columns = {elem : elem + '_dpe' for elem in ['commune', 'type_voie', 'numero_rue', 'id']} , inplace = True)
+dpe.rename(columns = {elem : elem + '_dpe' for elem in ['commune', 'type_voie', 'numero_rue', 'nom_rue', 'id']} , inplace = True)
 dpe.rename(columns = {'result_id': 'id_geo', 'result_score' : 'score'} , inplace = True)
 
 all_join = dpe.merge(joined, on = ('latitude', 'longitude', 'score', 'id_geo'), how = 'outer')
@@ -45,7 +52,7 @@ grouped = all_join.groupby('id_geo')
 sumed = grouped[['consommation_energie_brut', 'estimation_ges_brut', 'surface_habitable', 'PDL_elec', 'CONSO_elec', 'PDL_gaz', 'CONSO_gaz']].sum()
 meaned = grouped[['latitude', 'longitude', 'score']].mean()
 firsted = grouped[['classe_consommation_energie', 'classe_estimation_ges', 'secteur_activite', 'commune_dpe', 'type_voie_dpe', 
-                   'numero_rue_dpe', 'result_label', 'result_type', 'NOM_COMMUNE', 'ADRESSE', 'FILIERE', 'CODE_GRAND_SECTEUR']].nth(0)
+                   'numero_rue_dpe', 'nom_rue_dpe', 'result_label', 'result_type', 'result_housenumber', 'result_name', 'NOM_COMMUNE', 'ADRESSE', 'FILIERE', 'CODE_GRAND_SECTEUR']].nth(0)
 
 merge1 = firsted.merge(meaned, on = 'id_geo')
 dpe_dle = merge1.merge(sumed, on = 'id_geo')
