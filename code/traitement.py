@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 
 elec = pd.read_csv('data/DLE-elec-2019-CCPM-geocoded.csv', sep = ';')
 gaz = pd.read_csv('data/DLE-gaz-2019-CCPM-geocoded.csv', sep = ';')
@@ -7,11 +8,17 @@ dpe = pd.read_csv('data/DPE_CCPM.csv', sep = ';')
 def convert_e2f(string):
     return float(string[0]+string[2:8]) * 10**(int(string[9:]) - 6)
 
-limite_classe_energie = {50 : 'A', 90 : 'B', 150 : 'C', 230 : 'D', 330 : 'E', 450 : 'F',}
+limite_classe_energie = {50 : 'A', 90 : 'B', 150 : 'C', 230 : 'D', 330 : 'E', 450 : 'F', math.inf : 'G'}
+limite_classe_ges = {5 : 'A', 10 : 'B', 20 : 'C', 35 : 'D', 55 : 'E', 80 : 'F', math.inf : 'G'}
+type_encadrement = {'consommation_energie' : limite_classe_energie, 'estimation_ges' : limite_classe_ges}
 
 
-def encadrement(val, dict):
-    pass
+def encadrement(val, inter):
+    for key in inter:
+        classe = inter[key]
+        if key > val:
+            break
+    return classe
 
 
 elec['CONSO'] = elec['CONSO'].apply(convert_e2f)
@@ -57,7 +64,14 @@ firsted = grouped[['classe_consommation_energie', 'classe_estimation_ges', 'sect
 merge1 = firsted.merge(meaned, on = 'id_geo')
 dpe_dle = merge1.merge(sumed, on = 'id_geo')
 
+for elem in {'consommation_energie', 'estimation_ges'}:
+    dens = (dpe_dle[elem + '_brut'] / dpe_dle['surface_habitable'])
+    classes = dens.apply(encadrement, args = (type_encadrement[elem],))
+    dpe_dle['classe_' + elem] = classes
 dpe_dle.to_csv('data/dpe_dle-pertinent.csv', ';')
+
+
+
 
 # def convert_e2f(string):
 #     return float(string[0] + string[2:8]) * 10**int(string[9:])
