@@ -32,13 +32,17 @@ gaz.rename(columns = {'CONSO': 'CONSO_gaz', 'PDL' : 'PDL_gaz', 'id': 'id_geo'}, 
 keys = ('FILIERE', 'CODE_GRAND_SECTEUR', 'ADRESSE', 'NOM_COMMUNE', 'latitude', 'longitude', 'id_geo', 'score')
 joined = elec.merge(gaz, on = keys, how = 'outer')
 
+for elem in {'consommation_energie', 'estimation_ges'}:
+    dpe[elem + '_brut'] = (dpe[elem] * dpe['surface_habitable'])
+
+# print(dpe[['consommation_energie', 'consommation_energie_brut', 'surface_habitable', 'estimation_ges', 'estimation_ges_brut']])
 dpe.rename(columns = {elem : elem + '_dpe' for elem in ['commune', 'type_voie', 'numero_rue', 'id']} , inplace = True)
 dpe.rename(columns = {'result_id': 'id_geo', 'result_score' : 'score'} , inplace = True)
 
 all_join = dpe.merge(joined, on = ('latitude', 'longitude', 'score', 'id_geo'), how = 'outer')
 
 grouped = all_join.groupby('id_geo')
-sumed = grouped[['consommation_energie', 'estimation_ges', 'surface_habitable', 'PDL_elec', 'CONSO_elec', 'PDL_gaz', 'CONSO_gaz']].sum()
+sumed = grouped[['consommation_energie_brut', 'estimation_ges_brut', 'surface_habitable', 'PDL_elec', 'CONSO_elec', 'PDL_gaz', 'CONSO_gaz']].sum()
 meaned = grouped[['latitude', 'longitude', 'score']].mean()
 firsted = grouped[['classe_consommation_energie', 'classe_estimation_ges', 'secteur_activite', 'commune_dpe', 'type_voie_dpe', 
                    'numero_rue_dpe', 'result_label', 'result_type', 'NOM_COMMUNE', 'ADRESSE', 'FILIERE', 'CODE_GRAND_SECTEUR']].nth(0)
