@@ -51,12 +51,12 @@ def add_categorical_legend(folium_map, title, colors, labels):
         
     legend_html = f"""
     <div id='maplegend' class='maplegend'>
-    <div class='legend-title'>{title}</div>
-    <div class='legend-scale'>
+      <div class='legend-title'>{title}</div>
+      <div class='legend-scale'>
         <ul class='legend-labels'>
         {legend_categories}
         </ul>
-    </div>
+      </div>
     </div>
     """
     script = f"""
@@ -65,27 +65,27 @@ def add_categorical_legend(folium_map, title, colors, labels):
                     var executed = false;
                     return function() {{
                         if (!executed) {{
-                            var checkExist = setInterval(function() {{
-                                    if ((document.getElementsByClassName('leaflet-top leaflet-left').length) || (!executed)) {{
-                                        document.getElementsByClassName('leaflet-top leaflet-left')[0].style.display = "flex"
-                                        document.getElementsByClassName('leaflet-top leaflet-left')[0].style.flexDirection = "column"
-                                        document.getElementsByClassName('leaflet-top leaflet-left')[0].innerHTML += `{legend_html}`;
-                                        clearInterval(checkExist);
-                                        executed = true;
-                                    }}
+                             var checkExist = setInterval(function() {{
+                                       if ((document.getElementsByClassName('leaflet-bottom leaflet-left').length) || (!executed)) {{
+                                          document.getElementsByClassName('leaflet-bottom leaflet-left')[0].style.display = "flex"
+                                          document.getElementsByClassName('leaflet-bottom leaflet-left')[0].style.flexDirection = "column"
+                                          document.getElementsByClassName('leaflet-bottom leaflet-left')[0].innerHTML += `{legend_html}`;
+                                          clearInterval(checkExist);
+                                          executed = true;
+                                       }}
                                     }}, 100);
                         }}
                     }};
                 }})();
         oneTimeExecution()
         </script>
-    """
-
+      """
+   
 
     css = """
 
     <style type='text/css'>
-    .maplegend {
+      .maplegend {
         z-index:9999;
         float:right;
         background-color: rgba(255, 255, 255, 1);
@@ -94,28 +94,28 @@ def add_categorical_legend(folium_map, title, colors, labels):
         padding: 10px;
         font-size:12px;
         positon: relative;
-    }
-    .maplegend .legend-title {
+      }
+      .maplegend .legend-title {
         text-align: left;
         margin-bottom: 5px;
         font-weight: bold;
         font-size: 90%;
         }
-    .maplegend .legend-scale ul {
+      .maplegend .legend-scale ul {
         margin: 0;
         margin-bottom: 5px;
         padding: 0;
         float: left;
         list-style: none;
         }
-    .maplegend .legend-scale ul li {
+      .maplegend .legend-scale ul li {
         font-size: 80%;
         list-style: none;
         margin-left: 0;
         line-height: 18px;
         margin-bottom: 2px;
         }
-    .maplegend ul.legend-labels li span {
+      .maplegend ul.legend-labels li span {
         display: block;
         float: left;
         height: 16px;
@@ -124,12 +124,12 @@ def add_categorical_legend(folium_map, title, colors, labels):
         margin-left: 0;
         border: 0px solid #ccc;
         }
-    .maplegend .legend-source {
+      .maplegend .legend-source {
         font-size: 80%;
         color: #777;
         clear: both;
         }
-    .maplegend a {
+      .maplegend a {
         color: #777;
         }
     </style>
@@ -186,7 +186,8 @@ for i in range(len(base_elec)):
     score = pourcentage(data['score'])
     
     fm.Marker(geocode,
-    popup=f"<p><strong>{name_tip}</strong></p><p><strong>Secteur&nbsp:&nbsp</strong>{name_grand_secteur}<p>{str(data['PDL'])}&nbsppoint(s)&nbspde&nbsplivraison</p><p><strong>Consommation</strong>: {significatifs(data['CONSO'],cs)}&nbspMWh</p><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color=color_filiere, icon = 'plug', prefix= 'fa',  icon_color = '#ffffff')).add_to(cluster_DLE_all)
+    popup=f"<p><strong>{name_tip}</strong></p><p><strong>Secteur&nbsp:&nbsp</strong>{name_grand_secteur}<p>{str(data['PDL'])}&nbsppoint(s)&nbspde&nbsplivraison</p><p><strong>Consommation</strong>: {significatifs(data['CONSO'],cs)}&nbspMWh</p><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color=color_filiere,  icon_color = '#ffffff')).add_to(cluster_DLE_all)
+
 
 ##pour le gaz
 
@@ -205,7 +206,7 @@ for i in range(len(base_gaz)):
     score = pourcentage(data['score'])
     
     fm.Marker(geocode,
-    popup=f"<p><strong>{name_tip}</strong></p><p><strong>Secteur&nbsp:&nbsp</strong>{name_grand_secteur}<p>{str(data['PDL'])}&nbsppoint(s)&nbspde&nbsplivraison</p><p><strong>Consommation</strong>:&nbsp{significatifs(data['CONSO'],cs)}&nbspMWh</p><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color=color_filiere, icon = 'plug', prefix= 'fa',  icon_color = '#ffffff')).add_to(cluster_DLE_all)
+    popup=f"<p><strong>{name_tip}</strong></p><p><strong>Secteur&nbsp:&nbsp</strong>{name_grand_secteur}<p>{str(data['PDL'])}&nbsppoint(s)&nbspde&nbsplivraison</p><p><strong>Consommation</strong>:&nbsp{significatifs(data['CONSO'],cs)}&nbspMWh</p><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color=color_filiere,  icon_color = '#ffffff')).add_to(cluster_DLE_all)
 
 base_DPE = pd.read_csv('../data/dpe_dle-pertinent.csv', ';')
 
@@ -217,9 +218,9 @@ cluster_DPE_conso = MarkerCluster().add_to(DPE_conso_group)
 
 #légende (couleurs de la classe)
 colors_conso = ['#039033', '#51b016', '#c8d200', '#fcea26', '#f8bb01', '#eb690b', '#e30c1c']
-labels_conso = ["A  (moins de 50 kWh d'énergie primaire par m^2 par an)", 'B  (entre 50 et 90)', 'C  (entre 90 et 150)','D  (entre 150 et 230)','E  (entre 230 et 330)','F  (entre 331 et 450)', 'G  (plus de 450)']
+labels_conso = ["A  (moins de 50)", 'B  (entre 50 et 90)', 'C  (entre 90 et 150)','D  (entre 150 et 230)','E  (entre 230 et 330)','F  (entre 331 et 450)', 'G  (plus de 450)']
 
-m = add_categorical_legend(m,'Classes de consommation énergétique (DPE)', colors = colors_conso, labels = labels_conso)
+m = add_categorical_legend(m," DPE - Classes de consommation énergétique <br>(en kWh d'énergie primaire par m^2 par an)", colors = colors_conso, labels = labels_conso)
 
 # d'où le dictionnaire associé
 # remarque : avec folium, on est vraiment libre que sur la couleur de l'intérieur de l'icône, donc on va fixer la couleur de l'extérieur sur du bleu
@@ -234,9 +235,9 @@ cluster_DPE_GES = MarkerCluster().add_to(DPE_GES_group)
 
 #même principe que précédemment pour la légende
 colors_GES = ['#feeff4', '#d9c1db', '#c6a8cc', '#b793bf', '#9e75ad', '#82599b', '#6a418f']
-labels_GES = ["A  (moins de 5 kg équivalent CO2 par m^2 par an)", 'B  (entre 6 et 10)', 'C  (entre 11 et 20)','D  (entre 21 et 35)','E  (entre 36 et 55)','F  (entre 56 et 80)', 'G  (plus de 80)']
+labels_GES = ["A  (moins de 5)", 'B  (entre 6 et 10)', 'C  (entre 11 et 20)','D  (entre 21 et 35)','E  (entre 36 et 55)','F  (entre 56 et 80)', 'G  (plus de 80)']
 
-m = add_categorical_legend(m,"Classes d'émissions de gaz à effet de serre (DPE)", colors = colors_GES, labels = labels_GES)
+#m = add_categorical_legend(m,"DPE - Classes d'émissions de gaz à effet de serre <br> (en kg équivalent CO2 par m^2 par an)", colors = colors_GES, labels = labels_GES)
 
 
 #de même, le dictionnaire associé
@@ -278,22 +279,19 @@ for i in range(len(base_DPE)):
     classe_conso = data['classe_consommation_energie']
     couleur_conso = dico_DPE_conso[classe_conso]
     conso_energie = surface_corr(data['consommation_energie_brut'])
-
-    fm.Marker(geocode,
-    popup=f"<p><strong>{name_tip}</strong></p><p>Surface&nbshabitable&nbsp:&nbsp{surface_habitable}&nbspmètres&nbspcarrés</p><p><strong>Classe&nbspConsommation&nbsp:&nbsp</strong>{classe_conso}</strong><p>Consommation&nbspénergétique&nbsp:&nbsp{conso_energie}&nbspkWh&nbsp(énergie&nbspprimaire)</p><p><strong><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color='blue', icon_color = couleur_conso, icon = 'home', prefix= 'fa')).add_to(cluster_DPE_conso)
-
-
-    # données sur les émissions de GES
+    
+   # données sur les émissions de GES
 
     classe_GES = data['classe_estimation_ges']
     couleur_GES = dico_DPE_GES[classe_GES]
     emissions_GES = surface_corr(data['estimation_ges_brut'])
 
     fm.Marker(geocode,
-    popup=f"<p><strong>{name_tip}</strong></p><p>Surface&nbsphabitable&nbsp:&nbsp{surface_habitable}&nbspmètres&nbspcarrés</p><p><strong>Classe&nbspEmissions&nbsp:&nbsp</strong>{classe_GES}</strong><p>Emission&nbspde&nbspgaz&nbspà&nbspeffet&nbspde&nbspserre&nbsp:&nbsp{emissions_GES}&nbspkg&nbspéquivalent&nbspCO2</p><p><strong><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color='blue', icon_color = couleur_GES, icon = 'home', prefix= 'fa')).add_to(cluster_DPE_GES)
-
-fm.Marker([48.39406536332271, 2.9518367606924776], icon=fm.Icon(icon = 'home',color='blue',icon_color='#e30c1c', prefix = 'fa'), ).add_to(m)
+    popup=f"<p><strong>{name_tip}</strong></p><p>Surface&nbsphabitable&nbsp:&nbsp{surface_habitable}&nbspmètres&nbspcarrés</p><p><strong>Classe&nbspConsommation&nbsp:&nbsp</strong>{classe_conso}</strong><br>Consommation&nbspénergétique&nbsp:&nbsp{conso_energie}&nbspkWh&nbsp(énergie&nbspprimaire)<p><strong>Classe&nbspEmissions&nbsp:&nbsp</strong>{classe_GES}</strong><br>Emission&nbspde&nbspgaz&nbspà&nbspeffet&nbspde&nbspserre&nbsp:&nbsp{emissions_GES}&nbspkg&nbspéquivalent&nbspCO2</p><p><strong><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color='blue', icon_color = couleur_conso, icon = 'home', prefix= 'fa')).add_to(cluster_DPE_conso)
+    
 
 fm.LayerControl().add_to(m)
+fm.plugins.Search(DPE_conso_group).add_to(m)
 
+#sauvegarde dans un fichier html
 m.save('../site/carte_projet.html')
