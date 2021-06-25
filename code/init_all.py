@@ -1,3 +1,7 @@
+### Ce programme va associer chaque adresse des bases DLE (electricité et gaz) à des coordonnées GPS 
+### à l'aide de l'API d'Etalab 
+### Il utilise le multiprocessing pour pallier au délai aller/retour de l'API (env. 0,2s).
+
 import multiprocessing as mp
 import pandas as pd
 import numpy as np
@@ -5,6 +9,7 @@ import requests
 import json
 import time
 
+### Pour chaque ligne de la base DLE, la fonction 'send' crée l'url de requête et l'insère dans une queue
 def send(queue, base):
     for i in base.index:
         adresse = base['ADRESSE'][i]
@@ -19,6 +24,8 @@ def send(queue, base):
     for _ in range(nb_proc):
         queue.put((-1, None))
 
+### La fonction 'make_requests' récupère chaque URL de la queue, exécute la requete, insère le résultat dans une autre queue.
+### Plusieurs process vont excécuter cett fonction. 
 def make_requests(queue_url, queue_json):
     running = True
     while running:
@@ -34,9 +41,12 @@ def make_requests(queue_url, queue_json):
         datum = reponse.json()
         queue_json.put((url_id, datum))
 
+### 'class_requests' remet les résultats de la queue dans le bon ordre.
+### Elle en profite aussi pour introduire un pourcentage d'avancée du programme.
 def class_requests(base, queue_json, classed_json, long, sortie):
     print("Requêtes à l'API Etalab en cours")
-    tampon = {}
+    tampon = {}      # Le tampon est un dictionnaire qui associe à un identifiant ses données. 
+                     # Il est rempli lorsque la première donnée de la queue n'est pas l'identifiant recherché.
     cpt = 0
     for i in base.index:
         cpt += 1
@@ -54,6 +64,7 @@ def class_requests(base, queue_json, classed_json, long, sortie):
     print('Classement des requêtes terminé.')
     treat_json(base, classed_json, sortie)
 
+### Cette fonction extrait du json les données qui nous intéressent et les enregistre dans le csv.
 def treat_json(base, L, sortie):
     erreur = 0
     Lon = []
