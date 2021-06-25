@@ -45,7 +45,6 @@ elec.rename(columns = {'CONSO': 'CONSO_elec', 'PDL' : 'PDL_elec', 'id': 'id_geo'
 gaz.rename(columns = {'CONSO': 'CONSO_gaz', 'PDL' : 'PDL_gaz', 'id': 'id_geo'}, inplace = True)
 keys = ('FILIERE', 'CODE_GRAND_SECTEUR', 'ADRESSE', 'NOM_COMMUNE', 'latitude', 'longitude', 'id_geo', 'score')
 joined = elec.merge(gaz, on = keys, how = 'outer')
-print(joined.keys())
 
 ### On introduit la consommation brute du logement, qui nous servira par la suite pour faire des groupements
 for elem in {'consommation_energie', 'estimation_ges'}:
@@ -59,7 +58,8 @@ dpe.rename(columns = {'result_id': 'id_geo', 'result_score' : 'score'} , inplace
 
 ### On joint tout
 all_join = dpe.merge(joined, on = ('latitude', 'longitude', 'score', 'id_geo'), how = 'outer')
-all_join.to_csv('data/test.csv', ';')
+
+
 
 
 ### On va distinguer les colonnes intéressantes en fonction de l'opération d'agrégation, et on les joint de nouveau
