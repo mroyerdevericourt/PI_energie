@@ -5,6 +5,7 @@ import folium as fm
 import csv
 import pandas as pd
 from folium.plugins import MarkerCluster
+from folium.plugins import Search
 
 cs = 3
 
@@ -189,29 +190,32 @@ for i in range(len(base_elec)):
     popup=f"<p><strong>{name_tip}</strong></p><p><strong>Secteur&nbsp:&nbsp</strong>{name_grand_secteur}<p>{str(data['PDL'])}&nbsppoint(s)&nbspde&nbsplivraison</p><p><strong>Consommation</strong>: {significatifs(data['CONSO'],cs)}&nbspMWh</p><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color=color_filiere,  icon_color = '#ffffff')).add_to(cluster_DLE_all)
 
 
+
 ##pour le gaz
 
 for i in range(len(base_gaz)):
 
-    data = base_gaz.loc[i]
+  data = base_gaz.loc[i]
 
-    geocode = [data['latitude'],data['longitude']]
+  geocode = [data['latitude'],data['longitude']]
 
-    name_tip = non_breaking_spaces(data['ADRESSE'])
-    filiere = data['FILIERE']
-    code_grand_secteur = data['CODE_GRAND_SECTEUR']
-    name_grand_secteur = dico_secteur[code_grand_secteur]
-    color_filiere = dico_couleur_filiere[filiere]
+  name_tip = non_breaking_spaces(data['ADRESSE'])
+  filiere = data['FILIERE']
+  code_grand_secteur = data['CODE_GRAND_SECTEUR']
+  name_grand_secteur = dico_secteur[code_grand_secteur]
+  color_filiere = dico_couleur_filiere[filiere]
 
-    score = pourcentage(data['score'])
+  score = pourcentage(data['score'])
     
-    fm.Marker(geocode,
-    popup=f"<p><strong>{name_tip}</strong></p><p><strong>Secteur&nbsp:&nbsp</strong>{name_grand_secteur}<p>{str(data['PDL'])}&nbsppoint(s)&nbspde&nbsplivraison</p><p><strong>Consommation</strong>:&nbsp{significatifs(data['CONSO'],cs)}&nbspMWh</p><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color=color_filiere,  icon_color = '#ffffff')).add_to(cluster_DLE_all)
+  fm.Marker(geocode, name = name_tip,
+  popup=f"<p><strong>{name_tip}</strong></p><p><strong>Secteur&nbsp:&nbsp</strong>{name_grand_secteur}<p>{str(data['PDL'])}&nbsppoint(s)&nbspde&nbsplivraison</p><p><strong>Consommation</strong>:&nbsp{significatifs(data['CONSO'],cs)}&nbspMWh</p><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color=color_filiere,  icon_color = '#ffffff')).add_to(cluster_DLE_all)
 
+
+# POUR LES DPE
 base_DPE = pd.read_csv('../data/dpe_dle-pertinent.csv', ';')
 
 #groupe pour le menu d'affichage
-DPE_conso_group = fm.FeatureGroup(name="DPE - Consommation énergétique").add_to(m)
+DPE_conso_group = fm.FeatureGroup(name="DPE").add_to(m)
 
 #cluster
 cluster_DPE_conso = MarkerCluster().add_to(DPE_conso_group)
@@ -228,14 +232,17 @@ m = add_categorical_legend(m," DPE - Classes de consommation énergétique <br>(
 dico_DPE_conso = {'A' : '#039033' , 'B' : '#51b016', 'C' : '#c8d200', 'D' :'#fcea26','E' : '#f8bb01' , 'F' : '#eb690b' , 'G' : '#e30c1c'}
 
 #groupe pour le menu d'affichage
-DPE_GES_group = fm.FeatureGroup(name="DPE - Gaz à effet de serre").add_to(m)
-
+#DPE_GES_group = fm.FeatureGroup(name="DPE - Gaz à effet de serre").add_to(m)
 #cluster
-cluster_DPE_GES = MarkerCluster().add_to(DPE_GES_group)
+#cluster_DPE_GES = MarkerCluster().add_to(DPE_GES_group)
 
 #même principe que précédemment pour la légende
 colors_GES = ['#feeff4', '#d9c1db', '#c6a8cc', '#b793bf', '#9e75ad', '#82599b', '#6a418f']
 labels_GES = ["A  (moins de 5)", 'B  (entre 6 et 10)', 'C  (entre 11 et 20)','D  (entre 21 et 35)','E  (entre 36 et 55)','F  (entre 56 et 80)', 'G  (plus de 80)']
+
+#groupe pour le menu d'affichage
+dico_DPE_GES = {'A' : '#feeff4' , 'B' : '#d9c1db', 'C' : '#c6a8cc', 'D' :'#b793bf','E' : '#9e75ad' , 'F' : '#82599b' , 'G' : '#6a418f'}
+
 
 #m = add_categorical_legend(m,"DPE - Classes d'émissions de gaz à effet de serre <br> (en kg équivalent CO2 par m^2 par an)", colors = colors_GES, labels = labels_GES)
 
@@ -265,12 +272,13 @@ def if_nan(string):
         return string
 
 for i in range(len(base_DPE)):
-    data = base_DPE.loc[i]
+  data = base_DPE.loc[i]
+  if data['consommation_energie_brut'] != 0.0 : #détecte les lignes uniquement DLE (et n'itère pas dessus)
     geocode = [data['latitude'], data['longitude']]
 
     #name_tip = non_breaking_spaces(str(data['numero_rue_dpe'])+str(data['nom_rue_dpe'])) 
     #ça met des nan quand y a pas 'numero_rue_dpe' et comme y a souvent pas le h
-    name_tip = non_breaking_spaces(str(data['nom_rue_dpe']))
+    name_tip = non_breaking_spaces(str(data['result_label']))
     surface_habitable = surface_corr(data['surface_habitable'])
     score = pourcentage(data['score'])
 
@@ -279,19 +287,23 @@ for i in range(len(base_DPE)):
     classe_conso = data['classe_consommation_energie']
     couleur_conso = dico_DPE_conso[classe_conso]
     conso_energie = surface_corr(data['consommation_energie_brut'])
-    
-   # données sur les émissions de GES
+      
+  # données sur les émissions de GES
 
     classe_GES = data['classe_estimation_ges']
     couleur_GES = dico_DPE_GES[classe_GES]
     emissions_GES = surface_corr(data['estimation_ges_brut'])
 
-    fm.Marker(geocode,
-    popup=f"<p><strong>{name_tip}</strong></p><p>Surface&nbsphabitable&nbsp:&nbsp{surface_habitable}&nbspmètres&nbspcarrés</p><p><strong>Classe&nbspConsommation&nbsp:&nbsp</strong>{classe_conso}</strong><br>Consommation&nbspénergétique&nbsp:&nbsp{conso_energie}&nbspkWh&nbsp(énergie&nbspprimaire)<p><strong>Classe&nbspEmissions&nbsp:&nbsp</strong>{classe_GES}</strong><br>Emission&nbspde&nbspgaz&nbspà&nbspeffet&nbspde&nbspserre&nbsp:&nbsp{emissions_GES}&nbspkg&nbspéquivalent&nbspCO2</p><p><strong><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color='blue', icon_color = couleur_conso, icon = 'home', prefix= 'fa')).add_to(cluster_DPE_conso)
+    fm.Marker(geocode, name = name_tip,
+    popup=f"<p><strong>{name_tip}</strong></p><p>Surface&nbsphabitable&nbsp:&nbsp{surface_habitable}&nbspmètres&nbspcarrés</p><p><strong>Classe&nbspConsommation&nbsp:&nbsp</strong>{classe_conso}</strong><br>Consommation&nbspénergétique&nbsp:&nbsp{conso_energie}&nbspkWh&nbsppar&nbspan&nbsp(énergie&nbspprimaire)<p><strong>Classe&nbspEmissions&nbsp:&nbsp</strong>{classe_GES}</strong><br>Emission&nbspde&nbspgaz&nbspà&nbspeffet&nbspde&nbspserre&nbsp:&nbsp{emissions_GES}&nbspkg&nbspéquivalent&nbspCO2</p><p><strong><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color='white', icon_color = couleur_conso, icon = 'home', prefix= 'fa')).add_to(cluster_DPE_conso)
+
+        #fm.Marker(geocode,
+        #popup=f"<p><strong>{name_tip}</strong></p><p>Surface&nbsphabitable&nbsp:&nbsp{surface_habitable}&nbspmètres&nbspcarrés</p><p><strong>Classe&nbspEmissions&nbsp:&nbsp</strong>{classe_GES}</strong><p>Emission&nbspde&nbspgaz&nbspà&nbspeffet&nbspde&nbspserre&nbsp:&nbsp{emissions_GES}&nbspkg&nbspéquivalent&nbspCO2</p><p><strong><p><em>Fiable&nbspà&nbsp{score}&nbsp%</em></p>",tooltip=name_tip,icon = fm.Icon(color='blue', icon_color = couleur_GES, icon = 'home', prefix= 'fa')).add_to(cluster_DPE_GES)      
     
 
 fm.LayerControl().add_to(m)
-fm.plugins.Search(DPE_conso_group).add_to(m)
+fm.plugins.Search(cluster_DPE_conso, search_label = "name", placeholder = "Rechercher un bâtiment (DPE)").add_to(m)
+#fm.plugins.Search(cluster_DLE_all, search_label = "name", placeholder = "Rechercher un bâtiment (DLE)").add_to(m)
 
 #sauvegarde dans un fichier html
 m.save('../site/carte_projet.html')
