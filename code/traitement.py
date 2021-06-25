@@ -11,8 +11,6 @@ def convert_e2f(string):
 limite_classe_energie = {50 : 'A', 90 : 'B', 150 : 'C', 230 : 'D', 330 : 'E', 450 : 'F', math.inf : 'G'}
 limite_classe_ges = {5 : 'A', 10 : 'B', 20 : 'C', 35 : 'D', 55 : 'E', 80 : 'F', math.inf : 'G'}
 type_encadrement = {'consommation_energie' : limite_classe_energie, 'estimation_ges' : limite_classe_ges}
-
-
 def encadrement(val, inter):
     for key in inter:
         classe = inter[key]
