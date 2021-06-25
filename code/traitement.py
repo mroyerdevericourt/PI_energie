@@ -45,6 +45,7 @@ elec.rename(columns = {'CONSO': 'CONSO_elec', 'PDL' : 'PDL_elec', 'id': 'id_geo'
 gaz.rename(columns = {'CONSO': 'CONSO_gaz', 'PDL' : 'PDL_gaz', 'id': 'id_geo'}, inplace = True)
 keys = ('FILIERE', 'CODE_GRAND_SECTEUR', 'ADRESSE', 'NOM_COMMUNE', 'latitude', 'longitude', 'id_geo', 'score')
 joined = elec.merge(gaz, on = keys, how = 'outer')
+print(joined.keys())
 
 ### On introduit la consommation brute du logement, qui nous servira par la suite pour faire des groupements
 for elem in {'consommation_energie', 'estimation_ges'}:
@@ -65,10 +66,9 @@ all_join.to_csv('data/test.csv', ';')
 grouped = all_join.groupby('id_geo')
 sumed = grouped[['consommation_energie_brut', 'estimation_ges_brut', 'surface_habitable', 'PDL_elec', 'CONSO_elec', 'PDL_gaz', 'CONSO_gaz']].sum()
 meaned = grouped[['latitude', 'longitude', 'score']].mean()
-firsted = grouped[['classe_consommation_energie', 'classe_estimation_ges', 'secteur_activite', 'commune_dpe', 'type_voie_dpe', 
-                   'numero_rue_dpe', 'nom_rue_dpe', 'result_label', 'result_type', 'result_housenumber', 'result_name', 'NOM_COMMUNE', 'ADRESSE', 'FILIERE', 'CODE_GRAND_SECTEUR']].first()
-
-
+firsted = grouped[['secteur_activite', 'result_label', 
+                    'result_type', 'result_housenumber', 'result_name', 'NOM_COMMUNE', 'ADRESSE', 
+                    'FILIERE', 'CODE_GRAND_SECTEUR']].first()
 merge1 = firsted.merge(meaned, on = 'id_geo')
 dpe_dle = merge1.merge(sumed, on = 'id_geo')
 
@@ -80,28 +80,3 @@ for elem in {'consommation_energie', 'estimation_ges'}:
     dpe_dle['classe_' + elem] = classes
 
 dpe_dle.to_csv('data/dpe_dle-pertinent.csv', ';')
-
-
-
-
-
-# def convert_e2f(string):
-#     return float(string[0] + string[2:8]) * 10**int(string[9:])
-# print(gaz.dtypes)
-# for base in [elec, gaz]:
-#     for key in ["CONSO", "PDL", "latitude", "longitude", "score"]:
-#         print(base[key])
-#         # base[key].transform(convert_e2f)
-
-# for key in ["consommation_energie", "estimation_ges", "surface_habitable", "latitude", "longitude", "result_score"]:
-#     # dpe[key].transform(convert_e2f)
-#     pass
-
-
-# joined = gaz.merge(elec, 'outer', "id")
-# print(joined)
-# dpe_grouped = dpe.groupby("result_id")
-# print(dpe_grouped)
-
-# joined = joined.merge(dpe, 'outer', left_on = "id", right_on = "result_id")
-# print(joined)
