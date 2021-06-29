@@ -18,8 +18,8 @@ m = fm.Map(location=[48.39406536332271, 2.9518367606924776], zoom_start=12)
 #création du groupe DLE (à afficher ou cacher sur la carte finale 'm') 
 DLE_group = fm.FeatureGroup(name="DLE").add_to(m)
 
-base_elec = pd.read_csv("../data/DLE-elec-2019-CCPM-geocoded.csv", ";")
-base_gaz = pd.read_csv("../data/DLE-gaz-2019-CCPM-geocoded.csv", ";")
+base_elec = pd.read_csv("data/DLE-elec-2019-CCPM-geocoded.csv", ";")
+base_gaz = pd.read_csv("data/DLE-gaz-2019-CCPM-geocoded.csv", ";")
 
 #documentation
 dico_secteur = {'A': 'Agriculture', 'I' : 'Industriel', 'X' : 'Professionnel non affecté', 'R' : 'Résidentiel', 'T' : 'Tertiaire'}
@@ -215,7 +215,7 @@ for i in range(len(base_gaz)):
 
 
 # POUR LES DPE
-base_DPE = pd.read_csv('../data/dpe_dle-pertinent.csv', ';')
+base_DPE = pd.read_csv('data/dpe_dle-pertinent.csv', ';')
 
 #groupe pour le menu d'affichage
 DPE_conso_group = fm.FeatureGroup(name="DPE").add_to(m)
@@ -309,4 +309,4 @@ fm.plugins.Search(cluster_DPE_conso, search_label = "name", placeholder = "Reche
 #fm.plugins.Search(cluster_DLE_all, search_label = "name", placeholder = "Rechercher un bâtiment (DLE)").add_to(m)
 
 #sauvegarde dans un fichier html
-m.save('../site/carte_projet.html')
+m.save('site/carte_projet.html')
