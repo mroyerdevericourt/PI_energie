@@ -1,4 +1,7 @@
-# Ce code correspond à la version python du code de la carte disponible sur le notebook 
+# Ce code correspond à la version python du code de la carte disponible sur le notebook
+# Il n'a don pas été recommenté
+# La seule ligne qui diffère est la dernière, qui permet d'enregistrer la carte
+# dans un fichier HTML afin de pouvoir l'ouvrir dans un névigateur. 
 
 
 import folium as fm
