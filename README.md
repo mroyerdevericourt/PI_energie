@@ -1,6 +1,3 @@
-
-Une liste des technologies utilisées et, le cas échéant, des liens vers d’autres informations sur ces technologies.
-
 ## CARTE INTERACTIVE DE LA CONSOMMATION ENERGETIQUE DE LA COMMUNAUTE DE COMMUNES DE MONTEREAU.
 
 ### SOMMAIRE
